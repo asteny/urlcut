@@ -1,0 +1,13 @@
+{
+  "names": "My new link",
+  "description": "Description for link",
+  "urlf": "https://example.com/fiz/baz/ololo",
+  "notActiveAfter": 1613779350,
+  "labels": [
+    "PostgreSQL",
+    "DevOps",
+    "Python"
+  ],
+  "creatore": "Pavel Sofrony",
+  "barcode": false
+}
