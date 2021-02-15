@@ -79,4 +79,5 @@ class Urls(Base):
         data = await self.request.json()
         log.debug("Delete data is %r", data)
 
-        return Response(status=HTTPStatus.OK)
+        # TODO: write method
+        return Response(status=HTTPStatus.NO_CONTENT)
