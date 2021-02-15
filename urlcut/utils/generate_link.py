@@ -1,5 +1,4 @@
 import logging
-from random import randint
 from typing import List
 
 from yarl import URL

@@ -26,7 +26,7 @@ class Urls(Base):
             log.debug("Parsed url_data is %r", parsed_url_data)
 
             get_next_db_id = await self.db.fetchval(
-                "SELECT NEXTVAL('links_id_seq')", column=0
+                "SELECT NEXTVAL('links_id_seq')", column=0,
             )
 
             short_url_path = generate_link_path(
