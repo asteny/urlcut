@@ -21,8 +21,8 @@ async def test_ping(api_client):
     "req_data, exp_resp",
     [
         (
-            get_json("data/not_valid_url_post.json"),
-            json.dumps(get_json("data/not_valid_url_post_resp.json"))
+            get_json("tests/data/not_valid_url_post.json"),
+            json.dumps(get_json("tests/data/not_valid_url_post_resp.json"))
         ),
     ],
 )
