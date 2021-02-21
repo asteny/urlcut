@@ -11,4 +11,4 @@ class UrlCreateData(BaseModel):
     notActiveAfter: datetime = None
     labels: List[str] = []
     creator: str = None
-    barcode: bool = False
+    qr: bool = False

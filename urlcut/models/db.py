@@ -25,7 +25,7 @@ links_table = Table(
     Column("name", String(50), nullable=False),
     Column("description", String(300)),
     Column("long_url", String(2000), nullable=False),
-    Column("short_url_path", String(50), nullable=False, unique=True,),
+    Column("short_url_path", String(50), nullable=False, unique=True),
     Column("not_active_after", TIMESTAMP(timezone=True), nullable=True),
     Column("labels", pg.ARRAY(String)),
     Column("creator", String(50), nullable=True),

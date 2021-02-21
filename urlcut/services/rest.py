@@ -8,6 +8,7 @@ from yarl import URL
 
 from urlcut.handlers.ping import Ping
 from urlcut.handlers.urls import Urls
+from urlcut.middleware import error_middleware
 
 
 log = logging.getLogger(__name__)
@@ -25,6 +26,7 @@ class Rest(AIOHTTPService):
 
     async def create_application(self):
         app = Application()
+        app.on_startup.append(self.setup_middlewares)
         router = app.router
 
         log.info("Starting API")
@@ -41,3 +43,7 @@ class Rest(AIOHTTPService):
         router.add_route("DELETE", "/delete", Urls)
 
         return app
+
+    @staticmethod
+    async def setup_middlewares(app: Application):
+        app.middlewares.append(error_middleware)
