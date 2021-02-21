@@ -3,7 +3,8 @@ from http import HTTPStatus
 from json import dumps
 from json.decoder import JSONDecodeError
 
-from aiohttp.web import HTTPException, Request, Response, middleware
+from aiohttp.web import HTTPException, Request, middleware
+from aiohttp.web_response import json_response
 from pydantic import ValidationError
 
 
@@ -16,23 +17,23 @@ async def error_middleware(request: Request, handler):
         response = await handler(request)
     except ValidationError as e:
         log.exception("Failed to verify request. Err: %r", e)
-        return Response(
+        return json_response(
             status=HTTPStatus.BAD_REQUEST,
-            text=dumps({"error": "Validate exception", "exception": str(e)}),
+            data=dumps({"error": "Validate exception", "exception": str(e)}),
         )
     except JSONDecodeError:
         log.exception("Failed to decode json")
-        return Response(
+        return json_response(
             status=HTTPStatus.BAD_REQUEST,
-            text=dumps({"error": "Failed to decode json"}),
+            data=dumps({"error": "Failed to decode json"}),
         )
     except HTTPException:
-        return Response(status=HTTPStatus.NOT_FOUND)
+        return json_response(status=HTTPStatus.NOT_FOUND)
     except Exception:
         log.exception("Server error")
-        return Response(
+        return json_response(
             status=HTTPStatus.INTERNAL_SERVER_ERROR,
-            text=dumps({"error": "Internal server error"})
+            data=dumps({"error": "Internal server error"})
         )
 
     return response
