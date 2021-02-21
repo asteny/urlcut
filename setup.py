@@ -22,11 +22,11 @@ setup(
     platforms="all",
     packages=find_packages(),
     install_requires=load_requirements("requirements.txt"),
-    extras_require={"develop": load_requirements("requirements.dev.txt")},
+    extras_require={"dev": load_requirements("requirements.dev.txt")},
     python_requires=">=3.7",
     entry_points={
         "console_scripts": [
-            "urlcut = urlcut.urlcut:main",
+            "urlcut = urlcut.main:main",
             "urlcut-db = urlcut.alembic.__main__:main",
         ],
     },

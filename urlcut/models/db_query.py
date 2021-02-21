@@ -20,7 +20,7 @@ async def insert_url_data(
 ) -> str:
     async with db.transaction() as conn:
         next_seq_id = await conn.fetchval(
-            f"SELECT NEXTVAL('links_id_seq')", column=0,
+            "SELECT NEXTVAL('links_id_seq')", column=0,
         )
         log.debug("Next sequence id is %d", next_seq_id)
 
