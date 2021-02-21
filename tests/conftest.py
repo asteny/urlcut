@@ -13,28 +13,33 @@ from asyncpgsa import create_pool
 
 
 @pytest.fixture()
-async def domain():
+def domain():
     return URL(os.environ.get("URLCUT_DOMAIN"))
 
 
 @pytest.fixture()
-async def alphabet():
+def alphabet():
     return list(os.environ.get("URLCUT_ALPHABET"))
 
 
 @pytest.fixture()
-async def pepper():
+def pepper():
     return int(os.environ.get("URLCUT_PEPPER"))
 
 
 @pytest.fixture()
-async def salt():
+def salt():
     return int(os.environ.get("URLCUT_SALT"))
 
 
 @pytest.fixture()
-async def pg_url():
+def pg_url():
     return URL(os.environ.get("URLCUT_PG_URL"))
+
+
+@pytest.fixture()
+def localhost():
+    return os.environ.get("URLCUT_LOCALHOST", "0.0.0.0")
 
 
 @pytest.fixture()
@@ -74,11 +79,11 @@ def arguments(
 
 
 @pytest.fixture
-def rest(arguments):
+async def rest(arguments, rest_url):
     setup_dependencies(arguments)
     socket = bind_socket(
-        address="",
-        port=arguments.port,
+        address="127.0.0.1",
+        port=rest_url.port,
         proto_name="http",
     )
     return Rest(
@@ -91,16 +96,23 @@ def rest(arguments):
 
 
 @pytest.fixture
-def services(rest):
+async def services(rest):
     return [rest]
+
+
+@pytest.fixture
+def rest_url(localhost, aiomisc_unused_port_factory):
+    return URL.build(
+        scheme="http",
+        host=localhost,
+        port=aiomisc_unused_port_factory()
+    )
 
 
 @pytest.fixture()
 async def api_client(rest_url):
     server = TestServer(Application())
-    server._root = URL.build(
-        scheme="http", host=rest_url.host, port=rest_url.port
-    )
+    server._root = rest_url
     client = TestClient(server)
     try:
         yield client
