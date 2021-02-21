@@ -77,7 +77,7 @@ def arguments(
 def rest(arguments):
     setup_dependencies(arguments)
     socket = bind_socket(
-        address=arguments.address,
+        address="",
         port=arguments.port,
         proto_name="http",
     )
