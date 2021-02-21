@@ -28,11 +28,6 @@ class Urls(Base):
             parsed_url_data=parsed_url_data,
         )
 
-        if not short_url_path:
-            return Response(
-                status=HTTPStatus.SERVICE_UNAVAILABLE,
-            )
-
         generated_link = generate_link(
             domain=self.domain, short_path=short_url_path,
         )

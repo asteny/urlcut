@@ -1,9 +1,10 @@
 import logging
 from http import HTTPStatus
+from json import dumps
 from json.decoder import JSONDecodeError
 
 from aiohttp.web import HTTPException, Request, Response, middleware
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 
 
 log = logging.getLogger(__name__)
@@ -16,17 +17,22 @@ async def error_middleware(request: Request, handler):
     except ValidationError as e:
         log.exception("Failed to verify request. Err: %r", e)
         return Response(
-            status=HTTPStatus.BAD_REQUEST, text=f"Validate exception% {e}",
+            status=HTTPStatus.BAD_REQUEST,
+            text=dumps({"error": "Validate exception", "exception": str(e)}),
         )
-    except JSONDecodeError as json_decode_error:
-        log.exception(json_decode_error)
+    except JSONDecodeError:
+        log.exception("Failed to decode json")
         return Response(
-            status=HTTPStatus.BAD_REQUEST, text="JSONDecodeError",
+            status=HTTPStatus.BAD_REQUEST,
+            text=dumps({"error": "Failed to decode json"}),
         )
     except HTTPException:
         return Response(status=HTTPStatus.NOT_FOUND)
     except Exception:
         log.exception("Server error")
-        return Response(status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        return Response(
+            status=HTTPStatus.INTERNAL_SERVER_ERROR,
+            text=dumps({"error": "Internal server error"})
+        )
 
     return response

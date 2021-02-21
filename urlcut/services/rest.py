@@ -25,8 +25,7 @@ class Rest(AIOHTTPService):
     db: pool
 
     async def create_application(self):
-        app = Application()
-        app.on_startup.append(self.setup_middlewares)
+        app = Application(middlewares=[error_middleware])
         router = app.router
 
         log.info("Starting API")
@@ -38,12 +37,8 @@ class Rest(AIOHTTPService):
         app["domain"] = self.domain
         app["db"] = self.db
 
-        router.add_route("GET", "/ping", Ping)
-        router.add_route("POST", "/create", Urls)
-        router.add_route("DELETE", "/delete", Urls)
+        router.add_route("GET", "/api/ping", Ping)
+        router.add_route("POST", "/api/create", Urls)
+        router.add_route("DELETE", "/api/delete", Urls)
 
         return app
-
-    @staticmethod
-    async def setup_middlewares(app: Application):
-        app.middlewares.append(error_middleware)
