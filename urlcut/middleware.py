@@ -33,7 +33,7 @@ async def error_middleware(request: Request, handler):
         log.exception("Server error")
         return json_response(
             status=HTTPStatus.INTERNAL_SERVER_ERROR,
-            data=dumps({"error": "Internal server error"})
+            data=dumps({"error": "Internal server error"}),
         )
 
     return response

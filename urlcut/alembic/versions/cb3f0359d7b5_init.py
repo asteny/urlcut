@@ -5,13 +5,12 @@ Revises:
 Create Date: 2021-01-31 12:31:08.549329
 
 """
+from alembic import op
 from sqlalchemy import (
     TIMESTAMP, Boolean, Column, Integer, PrimaryKeyConstraint, String,
     UniqueConstraint, text,
 )
 from sqlalchemy.dialects import postgresql as pg
-
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

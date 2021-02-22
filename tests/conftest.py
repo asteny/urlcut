@@ -1,15 +1,15 @@
 import os
+
 import pytest
 from aiohttp.test_utils import TestClient, TestServer
 from aiohttp.web_app import Application
 from aiomisc import bind_socket
-from urlcut.deps import setup_dependencies
-
-from urlcut.services.rest import Rest
-from urlcut.main import parser
-
-from yarl import URL
 from asyncpgsa import create_pool
+from yarl import URL
+
+from urlcut.deps import setup_dependencies
+from urlcut.main import parser
+from urlcut.services.rest import Rest
 
 
 @pytest.fixture()
@@ -47,7 +47,7 @@ async def pg_engine(pg_url):
     pool = await create_pool(
         dsn=str(pg_url),
         min_size=1,
-        max_size=2
+        max_size=2,
     )
 
     await pool.fetch("SELECT 1")
@@ -66,17 +66,17 @@ def arguments(
         alphabet,
         salt,
         pepper,
-        pg_url
+        pg_url,
 ):
     return parser.parse_args(
         [
             "--log-level=debug",
             f"--domain={domain}",
-            f"--alphabet", *alphabet,
+            "--alphabet", *alphabet,
             f"--salt={salt}",
             f"--pepper={pepper}",
             f"--pg-url={pg_url}",
-        ]
+        ],
     )
 
 
@@ -107,7 +107,7 @@ def rest_url(localhost, aiomisc_unused_port_factory):
     return URL.build(
         scheme="http",
         host=localhost,
-        port=aiomisc_unused_port_factory()
+        port=aiomisc_unused_port_factory(),
     )
 
 

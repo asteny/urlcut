@@ -7,9 +7,9 @@ import argparse
 import logging
 import os
 
-from urlcut.alembic_config import make_alembic_config
-
 from alembic.config import CommandLine
+
+from urlcut.alembic_config import make_alembic_config
 
 
 def main():
