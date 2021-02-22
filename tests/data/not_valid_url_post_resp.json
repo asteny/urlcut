@@ -1,0 +1,4 @@
+{
+  "error": "Validate exception",
+  "exception": "2 validation errors for UrlCreateData\nname\n  field required (type=value_error.missing)\nurl\n  field required (type=value_error.missing)"
+}
