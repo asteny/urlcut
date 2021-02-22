@@ -26,10 +26,8 @@ async def test_create_not_valid(api_client):
             "api/create", json=get_json("tests/data/not_valid_url_post.json"),
     ) as response:
         assert response.status == HTTPStatus.BAD_REQUEST
-        assert await response.json() == json.dumps(
-            get_json(
+        assert await response.json() == get_json(
                 "tests/data/not_valid_url_post_resp.json",
-            ),
         )
 
 
@@ -38,9 +36,7 @@ async def test_create_without_data(api_client):
             "api/create",
     ) as response:
         assert response.status == HTTPStatus.BAD_REQUEST
-        assert await response.json() == json.dumps(
-            {"error": "Failed to decode json"},
-        )
+        assert await response.json() == {"error": "Failed to decode json"}
 
 
 async def test_create_valid(api_client, pg_engine):

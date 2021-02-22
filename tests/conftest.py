@@ -84,7 +84,7 @@ def arguments(
 async def rest(arguments, rest_url):
     setup_dependencies(arguments)
     socket = bind_socket(
-        address="127.0.0.1",
+        address=rest_url.host,
         port=rest_url.port,
         proto_name="http",
     )
