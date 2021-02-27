@@ -26,8 +26,8 @@ async def error_middleware(request: Request, handler):
             status=HTTPStatus.BAD_REQUEST,
             data={"error": "Failed to decode json"},
         )
-    except HTTPException:
-        return json_response(status=HTTPStatus.NOT_FOUND)
+    except HTTPException as e:
+        return json_response(status=e.status, data={"error": e.text})
     except Exception:
         log.exception("Server error")
         return json_response(
