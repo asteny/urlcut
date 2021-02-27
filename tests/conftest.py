@@ -55,8 +55,6 @@ async def pg_engine(pg_url):
     try:
         yield pool
     finally:
-        await pool.fetch("ALTER SEQUENCE links_id_seq RESTART WITH 1;")
-        await pool.fetch("DELETE FROM links;")
         await pool.close()
 
 
