@@ -2,6 +2,7 @@ import json
 from http import HTTPStatus
 
 from sqlalchemy import select
+from sqlalchemy.sql.expression import true
 from yarl import URL
 
 from urlcut.models.db import links_table
@@ -85,6 +86,62 @@ async def test_create_valid(
             assert response.status == HTTPStatus.CREATED
             assert await response.json() == {"link": str(link)}
             assert url_path["short_url_path"] == str(URL(link).path).strip("/")
+
+
+async def test_delete(api_client, pg_engine):
+    active_id, short_url_path = await pg_engine.fetchrow(
+        select([links_table.c.id, links_table.c.short_url_path]).where(
+                links_table.c.active == true(),
+        ),
+    )
+    async with api_client.delete(
+            f"api/delete/{short_url_path}",
+    ) as response:
+        assert response.status == HTTPStatus.NO_CONTENT
+
+    active = await pg_engine.fetchval(
+        select([links_table.c.active]).where(
+                links_table.c.id == active_id,
+        ),
+    )
+    assert active is False
+
+    await pg_engine.fetchrow(
+        links_table.update().where(
+            links_table.c.id == int(active_id),
+        ).values(active=True),
+    )
+
+
+async def test_delete_not_found(api_client, pg_engine, domain):
+    active_id, short_url_path = await pg_engine.fetchrow(
+        select([links_table.c.id, links_table.c.short_url_path]).where(
+                links_table.c.active == true(),
+        ),
+    )
+    await pg_engine.fetchrow(
+        links_table.update().where(
+            links_table.c.id == int(active_id),
+        ).values(active=False),
+    )
+
+    async with api_client.delete(
+            f"api/delete/{short_url_path}",
+    ) as response:
+        assert response.status == HTTPStatus.NOT_FOUND
+
+        generated_link = generate_link(
+            domain=domain, short_path=short_url_path,
+        )
+        assert await response.json() == {
+            "error": f"{generated_link} not found",
+        }
+
+    await pg_engine.fetchrow(
+        links_table.update().where(
+            links_table.c.id == int(active_id),
+        ).values(active=True),
+    )
 
 
 async def test_db(pg_engine):
