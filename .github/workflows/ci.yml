@@ -30,6 +30,7 @@ jobs:
         with:
           args: |
             /bin/bash -c "python3.9 -m venv /home && /home/bin/pip install -U pip &&
+            /home/bin/pip install wheel &&
             /home/bin/pip install -U '.[dev]' &&
             /home/bin/pylama &&
             wait-for-port postgres:5432 &&
