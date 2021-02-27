@@ -20,6 +20,14 @@ async def test_ping(api_client):
         assert await response.json() == {"pg_health": "alive"}
 
 
+async def test_wrong_method(api_client):
+    async with api_client.delete(
+            "api/ping",
+    ) as response:
+        assert response.status == HTTPStatus.METHOD_NOT_ALLOWED
+        assert await response.json() == {"error": "405: Method Not Allowed"}
+
+
 async def test_create_not_valid(api_client):
 
     async with api_client.post(
