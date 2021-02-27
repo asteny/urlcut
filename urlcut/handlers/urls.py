@@ -43,12 +43,6 @@ class Urls(Base):
         log.debug("Short link from request is %r", short_path)
 
         if not await deactivate_link(self.db, short_path):
-            generated_link = generate_link(
-                domain=self.domain, short_path=short_path,
-            )
-            return json_response(
-                status=HTTPStatus.NOT_FOUND,
-                data={"error": f"{generated_link} not found"},
-            )
+            log.info("%r not found", short_path)
 
         return json_response(status=HTTPStatus.NO_CONTENT)

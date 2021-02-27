@@ -1,14 +1,11 @@
 import json
 from http import HTTPStatus
 
+import pytest
 from sqlalchemy import select
-from sqlalchemy.sql.expression import true
 from yarl import URL
 
 from urlcut.models.db import links_table
-from urlcut.utils.generate_link import (
-    generate_link, generate_link_path, salted_number,
-)
 
 
 def get_json(file):
@@ -52,8 +49,14 @@ async def test_create_without_data(api_client):
         assert await response.json() == {"error": "Failed to decode json"}
 
 
+@pytest.fixture()
+async def clear_db(pg_engine):
+    await pg_engine.fetch("ALTER SEQUENCE links_id_seq RESTART WITH 1;")
+    await pg_engine.fetch("DELETE FROM links;")
+
+
 async def test_create_valid(
-        api_client, pg_engine, alphabet, domain, salt, pepper
+        api_client, clear_db, pg_engine
 ):
     async with api_client.post(
             "api/create", json=get_json("tests/data/valid_url_post.json"),
@@ -63,85 +66,59 @@ async def test_create_valid(
                 "SELECT last_value FROM links_id_seq;", column=0,
             )
 
-            salted_num = salted_number(
-                number=last_seq_id,
-                salt=salt,
-                pepper=pepper,
-
-            )
-
-            link = generate_link(
-                domain=domain,
-                short_path=generate_link_path(
-                    salted_num=salted_num,
-                    alphabet=alphabet,
-                ),
-            )
+            assert last_seq_id == 1
 
             url_path = await conn.fetchrow(
                 select([links_table.c.short_url_path]).where(
                     links_table.c.id == last_seq_id,
                 ),
             )
+
             assert response.status == HTTPStatus.CREATED
-            assert await response.json() == {"link": str(link)}
-            assert url_path["short_url_path"] == str(URL(link).path).strip("/")
+            assert await response.json() == {
+                "link": "http://example.com/CaCCgCaaaaAaAAAC",
+            }
+            assert url_path["short_url_path"] == "CaCCgCaaaaAaAAAC"
 
 
-async def test_delete(api_client, pg_engine):
-    active_id, short_url_path = await pg_engine.fetchrow(
-        select([links_table.c.id, links_table.c.short_url_path]).where(
-                links_table.c.active == true(),
-        ),
+@pytest.fixture()
+async def create_link(api_client):
+    resp = await api_client.post(
+        "api/create", json=get_json("tests/data/valid_url_post.json"),
     )
+    return URL(
+        (await resp.json()).get("link"),
+    )
+
+
+async def test_delete(api_client, create_link, pg_engine):
+    path_from_created_link = create_link.path.lstrip("/")
+
     async with api_client.delete(
-            f"api/delete/{short_url_path}",
+            f"api/delete/{path_from_created_link}",
     ) as response:
         assert response.status == HTTPStatus.NO_CONTENT
 
     active = await pg_engine.fetchval(
         select([links_table.c.active]).where(
-                links_table.c.id == active_id,
+                links_table.c.short_url_path == path_from_created_link,
         ),
     )
     assert active is False
 
-    await pg_engine.fetchrow(
-        links_table.update().where(
-            links_table.c.id == int(active_id),
-        ).values(active=True),
-    )
 
-
-async def test_delete_not_found(api_client, pg_engine, domain):
-    active_id, short_url_path = await pg_engine.fetchrow(
-        select([links_table.c.id, links_table.c.short_url_path]).where(
-                links_table.c.active == true(),
-        ),
-    )
-    await pg_engine.fetchrow(
-        links_table.update().where(
-            links_table.c.id == int(active_id),
-        ).values(active=False),
-    )
-
+async def test_delete_not_found(api_client):
     async with api_client.delete(
-            f"api/delete/{short_url_path}",
+            "api/delete/azaza",
+    ) as response:
+        assert response.status == HTTPStatus.NO_CONTENT
+
+
+async def test_delete_non_alphabet(api_client):
+    async with api_client.delete(
+            "api/delete/12345",
     ) as response:
         assert response.status == HTTPStatus.NOT_FOUND
-
-        generated_link = generate_link(
-            domain=domain, short_path=short_url_path,
-        )
-        assert await response.json() == {
-            "error": f"{generated_link} not found",
-        }
-
-    await pg_engine.fetchrow(
-        links_table.update().where(
-            links_table.c.id == int(active_id),
-        ).values(active=True),
-    )
 
 
 async def test_db(pg_engine):
