@@ -119,12 +119,3 @@ async def test_delete_non_alphabet(api_client):
             "api/delete/12345",
     ) as response:
         assert response.status == HTTPStatus.NOT_FOUND
-
-
-async def test_db(pg_engine):
-    async with pg_engine.acquire() as conn:
-        # uncomment for clear database
-        # await pool.fetch("ALTER SEQUENCE links_id_seq RESTART WITH 1;")
-        # await pool.fetch("DELETE FROM links;")
-        result = await conn.execute(select([links_table]))
-        assert result
