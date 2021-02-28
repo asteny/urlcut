@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 from asyncpgsa import pool
-from sqlalchemy import and_, select
+from sqlalchemy import and_, extract, select
 from sqlalchemy.sql.expression import true
 
 from urlcut.models.db import links_table
@@ -46,7 +46,7 @@ async def insert_url_data(
                 not_active_after=parsed_url_data.notActiveAfter,
                 labels=parsed_url_data.labels,
                 creator=parsed_url_data.creator,
-                active=True,
+                active=parsed_url_data.active,
             ),
         )
 
@@ -79,3 +79,19 @@ async def deactivate_link(db: pool, short_path: str):
             return True
 
     return False
+
+
+async def get_link_state(db: pool, short_path: str):
+    return await db.fetchrow(
+        select(
+            [
+                links_table.c.long_url,
+                links_table.c.active,
+                extract(
+                    "epoch", links_table.c.not_active_after,
+                ).label("not_active_after"),
+            ],
+        ).where(
+            links_table.c.short_url_path == short_path,
+        ),
+    )

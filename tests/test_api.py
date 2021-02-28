@@ -82,7 +82,7 @@ async def test_create_valid(
 
 
 @pytest.fixture()
-async def create_link(api_client):
+async def create_valid_link(api_client):
     resp = await api_client.post(
         "api/create", json=get_json("tests/data/valid_url_post.json"),
     )
@@ -91,8 +91,44 @@ async def create_link(api_client):
     )
 
 
-async def test_delete(api_client, create_link, pg_engine):
-    path_from_created_link = create_link.path.lstrip("/")
+@pytest.fixture()
+async def create_not_valid_after_link(api_client):
+    resp = await api_client.post(
+        "api/create", json=get_json(
+            "tests/data/valid_url_post_not_valid_after.json",
+        ),
+    )
+    return URL(
+        (await resp.json()).get("link"),
+    )
+
+
+@pytest.fixture()
+async def without_not_activ_after_link(api_client):
+    resp = await api_client.post(
+        "api/create", json=get_json(
+            "tests/data/valid_url_post_without_not_activ_after.json",
+        ),
+    )
+    return URL(
+        (await resp.json()).get("link"),
+    )
+
+
+@pytest.fixture()
+async def create_valid_not_active_link(api_client):
+    resp = await api_client.post(
+        "api/create", json=get_json(
+            "tests/data/valid_url_post_not_active.json",
+        ),
+    )
+    return URL(
+        (await resp.json()).get("link"),
+    )
+
+
+async def test_delete(api_client, create_valid_link, pg_engine):
+    path_from_created_link = create_valid_link.path.lstrip("/")
 
     async with api_client.delete(
             f"api/delete/{path_from_created_link}",
@@ -119,3 +155,38 @@ async def test_delete_non_alphabet(api_client):
             "api/delete/12345",
     ) as response:
         assert response.status == HTTPStatus.NOT_FOUND
+
+
+async def test_get_absent_link(api_client):
+    async with api_client.get(
+            "someLink",
+    ) as response:
+        assert response.status == HTTPStatus.NOT_FOUND
+
+
+async def test_get_link(api_client, clear_db, create_valid_link):
+    path_from_created_link = create_valid_link.path.lstrip("/")
+    async with api_client.get(
+            path_from_created_link,
+            allow_redirects=False,
+    ) as response:
+        assert response.status == HTTPStatus.MOVED_PERMANENTLY
+        assert response.headers.get(
+            "Location",
+        ) == "https://example.com/fiz/baz/ololo"
+
+
+async def test_get_not_valid_after_link(
+        api_client, clear_db, create_not_valid_after_link
+):
+    path_from_created_link = create_not_valid_after_link.path.lstrip("/")
+    async with api_client.get(path_from_created_link) as response:
+        assert response.status == HTTPStatus.GONE
+
+
+async def test_get_not_active_link(
+        api_client, clear_db, create_valid_not_active_link
+):
+    path_from_created_link = create_valid_not_active_link.path.lstrip("/")
+    async with api_client.get(path_from_created_link) as response:
+        assert response.status == HTTPStatus.GONE

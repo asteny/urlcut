@@ -8,6 +8,7 @@ class UrlCreateData(BaseModel):
     name: str
     description: str = None
     url: HttpUrl
+    active: bool = True
     notActiveAfter: datetime = None
     labels: List[str] = []
     creator: str = None

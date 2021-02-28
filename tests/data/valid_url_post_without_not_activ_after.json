@@ -2,7 +2,6 @@
   "name": "My new link",
   "description": "Description for link",
   "url": "https://example.com/fiz/baz/ololo",
-  "notActiveAfter": 1677562064,
   "labels": [
     "PostgreSQL",
     "DevOps",
