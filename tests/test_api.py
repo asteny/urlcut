@@ -131,7 +131,7 @@ async def test_delete(api_client, create_valid_link, pg_engine):
     path_from_created_link = create_valid_link.path.lstrip("/")
 
     async with api_client.delete(
-            f"api/delete/{path_from_created_link}",
+            path_from_created_link,
     ) as response:
         assert response.status == HTTPStatus.NO_CONTENT
 
@@ -145,14 +145,14 @@ async def test_delete(api_client, create_valid_link, pg_engine):
 
 async def test_delete_not_found(api_client):
     async with api_client.delete(
-            "api/delete/azaza",
+            "azaza",
     ) as response:
         assert response.status == HTTPStatus.NO_CONTENT
 
 
 async def test_delete_non_alphabet(api_client):
     async with api_client.delete(
-            "api/delete/12345",
+            "12345",
     ) as response:
         assert response.status == HTTPStatus.NOT_FOUND
 
