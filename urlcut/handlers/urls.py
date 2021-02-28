@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+import time
 from http import HTTPStatus
 
 from aiohttp.web_response import json_response
@@ -51,12 +51,11 @@ class Urls(Base):
             log.debug("Link: %r not found", short_path)
             return json_response(status=HTTPStatus.NOT_FOUND)
 
-        redirect_link, acive, not_active_after = link_state
+        redirect_link, active, not_active_after = link_state
 
         if not all((
-                acive,
-                not_active_after is None or
-                not_active_after > datetime.timestamp(datetime.now()),
+                active,
+                not_active_after is None or not_active_after > time.time(),
         )):
             log.debug("Link: %r was deactivated", short_path)
             return json_response(status=HTTPStatus.GONE)
