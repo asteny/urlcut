@@ -143,18 +143,12 @@ async def test_delete(api_client, create_valid_link, pg_engine):
     assert active is False
 
 
-async def test_delete_not_found(api_client):
+@pytest.mark.parametrize("url_path", ['azaza', '12345', 'asas11', '33asas11'])
+async def test_delete_not_found(api_client, url_path):
     async with api_client.delete(
-            "azaza",
+            url_path,
     ) as response:
         assert response.status == HTTPStatus.NO_CONTENT
-
-
-async def test_delete_non_alphabet(api_client):
-    async with api_client.delete(
-            "12345",
-    ) as response:
-        assert response.status == HTTPStatus.NOT_FOUND
 
 
 async def test_get_absent_link(api_client):
