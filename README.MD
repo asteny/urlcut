@@ -7,3 +7,7 @@ Urlcut - yet another URL shortener built on asynchronous Python.
 python >=3.7
 PostgreSQL
 ```
+#### TODO 
+- docker images
+- docker-compose
+- swagger
