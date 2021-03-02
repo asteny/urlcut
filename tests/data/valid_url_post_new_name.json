@@ -1,0 +1,13 @@
+{
+  "name": "My new double link",
+  "description": "Description for double link",
+  "url": "https://example.com/fiz/baz/ololo",
+  "notActiveAfter": 1677562064,
+  "labels": [
+    "PostgreSQL",
+    "DevOps",
+    "Python"
+  ],
+  "creator": "Pavel Sofrony",
+  "qr": false
+}

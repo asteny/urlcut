@@ -1,6 +1,7 @@
 import logging
-from typing import List
+from typing import Dict, List
 
+from asyncpg import Record
 from asyncpgsa import pool
 from sqlalchemy import and_, extract, select
 from sqlalchemy.sql.expression import true
@@ -11,6 +12,19 @@ from urlcut.utils.generate_link import generate_link_path, salted_number
 
 
 log = logging.getLogger(__name__)
+
+
+async def get_link_data_by_long_url(db: pool, long_ulr: str) -> List[Dict]:
+    query = select(
+        [
+            links_table.c.name,
+            links_table.c.description,
+            links_table.c.long_url,
+            links_table.c.short_url_path,
+            links_table.c.labels,
+        ],
+    ).where(links_table.c.long_url == long_ulr)
+    return [dict(package) for package in await db.fetch(query)]
 
 
 async def insert_url_data(
@@ -53,7 +67,7 @@ async def insert_url_data(
         return short_url_path
 
 
-async def deactivate_link(db: pool, short_path: str):
+async def deactivate_link(db: pool, short_path: str) -> bool:
     async with db.transaction() as conn:
         active_id_query = select(
             [links_table.c.id],
@@ -81,7 +95,7 @@ async def deactivate_link(db: pool, short_path: str):
     return False
 
 
-async def get_link_state(db: pool, short_path: str):
+async def get_link_state(db: pool, short_path: str) -> Record:
     return await db.fetchrow(
         select(
             [
