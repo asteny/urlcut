@@ -25,7 +25,7 @@ async def create_valid_link(api_client):
 
 
 @pytest.fixture()
-async def create_valid_link_with_new_nake(api_client):
+async def create_valid_link_with_new_name(api_client):
     resp = await api_client.post(
         "api/create", json=get_json("tests/data/valid_url_post_new_name.json"),
     )
@@ -190,7 +190,7 @@ async def test_create_with_new_name(
 
 async def test_create_repeate_with_new_name(
         api_client, clear_db, create_valid_link,
-        create_valid_link_with_new_nake, pg_engine,
+        create_valid_link_with_new_name, pg_engine,
 ):
     async with api_client.post(
             "api/create",

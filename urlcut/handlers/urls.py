@@ -6,7 +6,8 @@ from aiohttp.web_response import json_response
 
 from urlcut.handlers.base import Base
 from urlcut.models.db_query import (
-    deactivate_link, get_link_data_by_long_url, get_link_state, insert_url_data,
+    deactivate_link, get_link_data_by_long_url,
+    get_link_state, insert_url_data,
 )
 from urlcut.models.urls import UrlCreateData
 from urlcut.utils.generate_link import generate_link
