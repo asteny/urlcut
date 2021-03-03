@@ -43,7 +43,6 @@ class Urls(Base):
                 if all((
                         name == parsed_url_data.name,
                         description == parsed_url_data.description,
-                        long_url == parsed_url_data.url,
                         labels == parsed_url_data.labels,
                 )):
                     return json_response(

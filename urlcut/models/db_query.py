@@ -24,7 +24,7 @@ async def get_link_data_by_long_url(db: pool, long_ulr: str) -> List[Dict]:
             links_table.c.labels,
         ],
     ).where(links_table.c.long_url == long_ulr)
-    return [dict(package) for package in await db.fetch(query)]
+    return [dict(link) for link in await db.fetch(query)]
 
 
 async def insert_url_data(
