@@ -60,7 +60,11 @@ def upgrade():
             "short_url_path", name=op.f("uq__links__short_url_path")
         ),
         UniqueConstraint(
-            "name", "description", "labels", name="uq__links__insert"
+            "name",
+            "description",
+            "labels",
+            "long_url",
+            name="uq__links__insert",
         ),
     )
 

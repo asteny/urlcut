@@ -1,0 +1,13 @@
+{
+  "name": "My new link",
+  "description": "Description for link",
+  "url": "https://example.com/new/link?realy=may_by",
+  "notActiveAfter": 1677562064,
+  "labels": [
+    "PostgreSQL",
+    "DevOps",
+    "Python"
+  ],
+  "creator": "Pavel Sofrony",
+  "qr": false
+}
