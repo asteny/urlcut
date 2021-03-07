@@ -4,7 +4,7 @@ from json.decoder import JSONDecodeError
 
 from aiohttp.web import (
     HTTPException,
-    HTTPPermanentRedirect,
+    HTTPRedirection,
     Request,
     middleware,
 )
@@ -31,7 +31,7 @@ async def error_middleware(request: Request, handler):
             status=HTTPStatus.BAD_REQUEST,
             data={"error": "Failed to decode json"},
         )
-    except HTTPPermanentRedirect as e:
+    except HTTPRedirection as e:
         return json_response(
             status=e.status,
             headers={"Location": e.headers["Location"]},
