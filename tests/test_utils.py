@@ -1,7 +1,9 @@
 from yarl import URL
 
 from urlcut.utils.generate_link import (
-    generate_link, generate_link_path, salted_number,
+    generate_link,
+    generate_link_path,
+    salted_number,
 )
 
 

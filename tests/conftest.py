@@ -60,17 +60,18 @@ async def pg_engine(pg_url):
 
 @pytest.fixture
 def arguments(
-        domain,
-        alphabet,
-        salt,
-        pepper,
-        pg_url,
+    domain,
+    alphabet,
+    salt,
+    pepper,
+    pg_url,
 ):
     return parser.parse_args(
         [
             "--log-level=debug",
             f"--domain={domain}",
-            "--alphabet", *alphabet,
+            "--alphabet",
+            *alphabet,
             f"--salt={salt}",
             f"--pepper={pepper}",
             f"--pg-url={pg_url}",

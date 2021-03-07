@@ -33,6 +33,7 @@ jobs:
             /home/bin/pip install wheel &&
             /home/bin/pip install -U '.[dev]' &&
             /home/bin/pylama &&
+            /home/bin/black -l 79 . --check &&
             wait-for-port postgres:5432 &&
             /home/bin/urlcut-db upgrade head &&
             /home/bin/pytest -vvv tests"

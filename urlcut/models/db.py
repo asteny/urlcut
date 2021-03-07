@@ -1,5 +1,12 @@
 from sqlalchemy import (
-    TIMESTAMP, Boolean, Column, Integer, MetaData, String, Table, func,
+    TIMESTAMP,
+    Boolean,
+    Column,
+    Integer,
+    MetaData,
+    String,
+    Table,
+    func,
 )
 from sqlalchemy.dialects import postgresql as pg
 
