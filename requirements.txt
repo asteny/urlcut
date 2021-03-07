@@ -1,6 +1,6 @@
 add-trailing-comma==2.0.2
 aiodine==1.2.9
-aiohttp==3.7.3
+aiohttp==3.7.4
 aiomisc==12.0.0
 aiomisc-dependency==0.1.16
 alembic==1.5.2
