@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Union
 
 from asyncpg import Record
 from asyncpgsa import pool
@@ -15,7 +15,9 @@ from urlcut.utils.generate_link import generate_link_path, salted_number
 log = logging.getLogger(__name__)
 
 
-async def get_url_short_path(db: pool, parsed_url_data: UrlCreateData) -> str:
+async def get_url_short_path(
+    db: pool, parsed_url_data: UrlCreateData
+) -> Union[str, None]:
     async with db.acquire() as conn:
         return await conn.fetchval(
             select([links_table.c.short_url_path]).where(
@@ -35,7 +37,7 @@ async def insert_url_data(
     salt: int,
     pepper: int,
     parsed_url_data: UrlCreateData,
-):
+) -> Union[str, None]:
     async with db.transaction() as conn:
         next_seq_id = await conn.fetchval(
             "SELECT NEXTVAL('links_id_seq')",

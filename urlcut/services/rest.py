@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from aiohttp.web import Application
+from aiohttp.web import Application, normalize_path_middleware
 from aiomisc.service.aiohttp import AIOHTTPService
 from asyncpgsa import pool
 from yarl import URL
@@ -25,9 +25,16 @@ class Rest(AIOHTTPService):
     db: pool
 
     async def create_application(self):
-        app = Application(middlewares=[error_middleware])
+        app = Application(
+            middlewares=[
+                error_middleware,
+                normalize_path_middleware(
+                    remove_slash=True,
+                    append_slash=False,
+                ),
+            ]
+        )
         router = app.router
-
         log.info("Starting API")
 
         app["alphabet"] = self.alphabet
