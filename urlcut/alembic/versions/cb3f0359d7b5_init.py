@@ -7,8 +7,14 @@ Create Date: 2021-01-31 12:31:08.549329
 """
 from alembic import op
 from sqlalchemy import (
-    TIMESTAMP, Boolean, Column, Integer, PrimaryKeyConstraint, String,
-    UniqueConstraint, text,
+    TIMESTAMP,
+    Boolean,
+    Column,
+    Integer,
+    PrimaryKeyConstraint,
+    String,
+    UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects import postgresql as pg
 
@@ -28,7 +34,10 @@ def upgrade():
         Column("description", String(length=300), nullable=True),
         Column("long_url", String(length=2000), nullable=False),
         Column(
-            "short_url_path", String(length=50), nullable=False, unique=True,
+            "short_url_path",
+            String(length=50),
+            nullable=False,
+            unique=True,
         ),
         Column("not_active_after", TIMESTAMP(timezone=True), nullable=True),
         Column("labels", pg.ARRAY(String), nullable=True),
@@ -47,7 +56,12 @@ def upgrade():
             nullable=False,
         ),
         PrimaryKeyConstraint("id", name=op.f("pk__groups")),
-        UniqueConstraint("short_url_path", name=op.f("uq__groups__group_id")),
+        UniqueConstraint(
+            "short_url_path", name=op.f("uq__links__short_url_path")
+        ),
+        UniqueConstraint(
+            "name", "description", "labels", name="uq__links__insert"
+        ),
     )
 
 
