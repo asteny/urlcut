@@ -11,7 +11,7 @@ def generate_link(domain: URL, short_path: str) -> URL:
     path = f"/{short_path}"
     return URL.build(
         scheme=domain.scheme,
-        host=domain.host,
+        host=domain.host,  # type: ignore
         path=path,
     )
 

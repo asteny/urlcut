@@ -12,7 +12,7 @@ PROJECT_PATH = Path(__file__).parent.resolve()
 
 def make_alembic_config(
     cmd_opts: Union[Namespace, SimpleNamespace],
-    base_path: str = PROJECT_PATH,
+    base_path: Path = PROJECT_PATH,
 ) -> Config:
     """
     Создает объект конфигурации alembic на основе аргументов командной строки,

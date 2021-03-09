@@ -1,15 +1,15 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel, HttpUrl
 
 
 class UrlCreateData(BaseModel):
     name: str
-    description: str = None
+    description: str = ""
     url: HttpUrl
     active: bool = True
-    notActiveAfter: datetime = None
+    notActiveAfter: Optional[datetime] = None
     labels: List[str] = []
-    creator: str = None
+    creator: str = ""
     qr: bool = False

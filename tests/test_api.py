@@ -73,7 +73,7 @@ async def create_valid_not_active_link(api_client):
     )
 
 
-def get_json(file):
+def get_json(file: str):
     with open(file) as json_file:
         data = json.load(json_file)
     return data

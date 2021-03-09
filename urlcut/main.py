@@ -91,7 +91,7 @@ group.add_argument("--pg-min-pool-size", required=False, type=int, default=1)
 group.add_argument("--pg-max-pool-size", required=False, type=int, default=10)
 
 
-def main():
+def main() -> None:
     args = parser.parse_args()
     os.environ.clear()
 

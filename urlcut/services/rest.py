@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 
 class Rest(AIOHTTPService):
-    __required__ = frozenset({"alphabet", "salt", "pepper", "domain"})
+    __required__ = ("alphabet", "salt", "pepper", "domain")
     __dependencies__ = ("db",)
 
     alphabet: List[str]

@@ -12,7 +12,7 @@ from alembic.config import CommandLine
 from urlcut.alembic_config import make_alembic_config
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.DEBUG)
 
     alembic = CommandLine()

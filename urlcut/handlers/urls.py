@@ -54,7 +54,7 @@ class Urls(Base):
         )
         generate_long_link = generate_link(
             domain=self.domain,
-            short_path=short_path_from_db,
+            short_path=str(short_path_from_db),
         )
         return json_response(
             status=HTTPStatus.OK,
