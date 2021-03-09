@@ -126,3 +126,35 @@ async def get_link_state(db: pool, short_path: str) -> Record:
                 links_table.c.short_url_path == short_path,
             ),
         )
+
+
+async def get_link_by_short_path(db: pool, short_path: str) -> Record:
+    async with db.acquire() as conn:
+        return await conn.fetchrow(
+            select(
+                [
+                    links_table.c.name,
+                    links_table.c.description,
+                    links_table.c.long_url,
+                    links_table.c.short_url_path,
+                    links_table.c.active,
+                    extract(
+                        "epoch",
+                        links_table.c.not_active_after,
+                    ).label("not_active_after"),
+                    links_table.c.labels,
+                    links_table.c.creator,
+                    links_table.c.active,
+                    extract(
+                        "epoch",
+                        links_table.c.created_at,
+                    ).label("created_at"),
+                    extract(
+                        "epoch",
+                        links_table.c.updated_at,
+                    ).label("updated_at"),
+                ],
+            ).where(
+                links_table.c.short_url_path == short_path,
+            ),
+        )

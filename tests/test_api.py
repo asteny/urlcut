@@ -228,6 +228,38 @@ async def test_create_repeat_with_new_name(
             assert url_path == "CaCCgCaaaaAaAAAA"
 
 
+async def test_unique_constraint(
+    api_client,
+    clear_db,
+    create_valid_link,
+    create_valid_link_with_new_name,
+    pg_engine,
+):
+    async with api_client.post(
+        "api/create",
+        json=get_json("tests/data/valid_url_post_new_url.json"),
+    ) as response:
+        async with pg_engine.acquire() as conn:
+            last_seq_id = await conn.fetchval(
+                "SELECT last_value FROM links_id_seq;",
+                column=0,
+            )
+
+            assert last_seq_id == 3
+
+            url_path = await conn.fetchval(
+                select([links_table.c.short_url_path]).where(
+                    links_table.c.id == 3,
+                ),
+            )
+
+            assert response.status == HTTPStatus.CREATED
+            assert await response.json() == {
+                "link": "http://example.com/CaCCgCaaaaAaAAAa",
+            }
+            assert url_path == "CaCCgCaaaaAaAAAa"
+
+
 async def test_delete(api_client, clear_db, create_valid_link, pg_engine):
     path_from_created_link = create_valid_link.path.lstrip("/")
 
@@ -288,3 +320,23 @@ async def test_get_not_active_link(
     path_from_created_link = create_valid_not_active_link.path.lstrip("/")
     async with api_client.get(path_from_created_link) as response:
         assert response.status == HTTPStatus.GONE
+
+
+async def test_get_link_info(api_client, clear_db, create_valid_link):
+    short_url_path = "CaCCgCaaaaAaAAAC"
+    async with api_client.get(
+        f"{short_url_path}/info",
+    ) as response:
+        assert response.status == HTTPStatus.OK
+
+        resp = await response.json()
+        assert resp.get("short_url_path") == short_url_path
+
+
+async def test_get_link_info_not_found(
+    api_client, clear_db, create_valid_link
+):
+    async with api_client.get(
+        "azaza/info",
+    ) as response:
+        assert response.status == HTTPStatus.NOT_FOUND
