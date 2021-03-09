@@ -1,4 +1,5 @@
 import logging
+from argparse import Namespace
 
 from aiomisc_dependency import dependency
 from asyncpgsa import create_pool
@@ -7,7 +8,7 @@ from asyncpgsa import create_pool
 log = logging.getLogger(__name__)
 
 
-def setup_dependencies(arguments):
+def setup_dependencies(arguments: Namespace):
     @dependency
     async def db(loop):
         db_info = arguments.pg_url.with_password("***")

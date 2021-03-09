@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from asyncpg import Record
 from asyncpgsa import pool
@@ -15,7 +15,9 @@ from urlcut.utils.generate_link import generate_link_path, salted_number
 log = logging.getLogger(__name__)
 
 
-async def get_url_short_path(db: pool, parsed_url_data: UrlCreateData) -> str:
+async def get_url_short_path(
+    db: pool, parsed_url_data: UrlCreateData
+) -> Optional[str]:
     async with db.acquire() as conn:
         return await conn.fetchval(
             select([links_table.c.short_url_path]).where(
@@ -35,7 +37,7 @@ async def insert_url_data(
     salt: int,
     pepper: int,
     parsed_url_data: UrlCreateData,
-):
+) -> Optional[str]:
     async with db.transaction() as conn:
         next_seq_id = await conn.fetchval(
             "SELECT NEXTVAL('links_id_seq')",
@@ -53,7 +55,7 @@ async def insert_url_data(
         )
         log.debug("Short link path is %r", short_url_path)
 
-        id = await conn.fetchval(
+        return await conn.fetchval(
             insert(links_table)
             .values(
                 id=next_seq_id,
@@ -66,14 +68,9 @@ async def insert_url_data(
                 creator=parsed_url_data.creator,
                 active=parsed_url_data.active,
             )
-            .returning(links_table.c.id)
+            .returning(links_table.c.short_url_path)
             .on_conflict_do_nothing(constraint="uq__links__insert"),
         )
-
-        if id:
-            return short_url_path
-
-        return None
 
 
 async def deactivate_link(db: pool, short_path: str) -> bool:

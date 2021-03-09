@@ -73,7 +73,7 @@ async def create_valid_not_active_link(api_client):
     )
 
 
-def get_json(file):
+def get_json(file: str):
     with open(file) as json_file:
         data = json.load(json_file)
     return data
@@ -340,3 +340,26 @@ async def test_get_link_info_not_found(
         "azaza/info",
     ) as response:
         assert response.status == HTTPStatus.NOT_FOUND
+
+
+async def test_trailing_slash(api_client, clear_db, create_valid_link):
+    short_url_path = "CaCCgCaaaaAaAAAC"
+    async with api_client.get(
+        f"{short_url_path}/info/",
+    ) as response:
+        assert response.status == HTTPStatus.OK
+
+        resp = await response.json()
+        assert resp.get("short_url_path") == short_url_path
+
+
+async def test_trailing_slash_without_redirect(
+    api_client, clear_db, create_valid_link
+):
+    async with api_client.get(
+        "CaCCgCaaaaAaAAAC/info/?key=value", allow_redirects=False
+    ) as response:
+        assert response.status == HTTPStatus.PERMANENT_REDIRECT
+
+        location = response.headers["Location"]
+        assert location == "/CaCCgCaaaaAaAAAC/info?key=value"

@@ -14,27 +14,31 @@ from urlcut.services.rest import Rest
 
 @pytest.fixture()
 def domain():
-    return URL(os.environ.get("URLCUT_DOMAIN"))
+    return URL(os.environ.get("URLCUT_DOMAIN", "http://example.com"))
 
 
 @pytest.fixture()
 def alphabet():
-    return list(os.environ.get("URLCUT_ALPHABET"))
+    return list(os.environ.get("URLCUT_ALPHABET", "aACg"))
 
 
 @pytest.fixture()
 def pepper():
-    return int(os.environ.get("URLCUT_PEPPER"))
+    return int(os.environ.get("URLCUT_PEPPER", 2222))
 
 
 @pytest.fixture()
 def salt():
-    return int(os.environ.get("URLCUT_SALT"))
+    return int(os.environ.get("URLCUT_SALT", 1111))
 
 
 @pytest.fixture()
 def pg_url():
-    return URL(os.environ.get("URLCUT_PG_URL"))
+    return URL(
+        os.environ.get(
+            "URLCUT_PG_URL", "postgresql://urlcut:12345@localhost:5432/urlcut"
+        )
+    )
 
 
 @pytest.fixture()

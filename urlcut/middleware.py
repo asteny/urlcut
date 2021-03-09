@@ -2,7 +2,12 @@ import logging
 from http import HTTPStatus
 from json.decoder import JSONDecodeError
 
-from aiohttp.web import HTTPException, Request, middleware
+from aiohttp.web import (
+    HTTPException,
+    HTTPRedirection,
+    Request,
+    middleware,
+)
 from aiohttp.web_response import json_response
 from pydantic import ValidationError
 
@@ -25,6 +30,12 @@ async def error_middleware(request: Request, handler):
         return json_response(
             status=HTTPStatus.BAD_REQUEST,
             data={"error": "Failed to decode json"},
+        )
+    except HTTPRedirection as e:
+        return json_response(
+            status=e.status,
+            headers={"Location": e.headers["Location"]},
+            data={"error": e.text},
         )
     except HTTPException as e:
         return json_response(status=e.status, data={"error": e.text})

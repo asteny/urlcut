@@ -5,7 +5,7 @@ __version__ = "0.1"
 __author__ = "Pavel Sofrony <pavel@sofrony.ru>"
 
 
-def load_requirements(fname):
+def load_requirements(fname: str):
     """ load requirements from a pip requirements file """
     with open(fname) as f:
         line_iter = (line.strip() for line in f.readlines())
