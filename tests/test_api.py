@@ -363,3 +363,39 @@ async def test_trailing_slash_without_redirect(
 
         location = response.headers["Location"]
         assert location == "/CaCCgCaaaaAaAAAC/info?key=value"
+
+
+async def test_update_without_data(api_client):
+    async with api_client.put(
+        "CaCCgCaaaaAaAAAC",
+    ) as response:
+        assert response.status == HTTPStatus.BAD_REQUEST
+        assert await response.json() == {"error": "Failed to decode json"}
+
+
+async def test_update_valid(
+    api_client, clear_db, create_valid_link, pg_engine
+):
+    async with api_client.put(
+        "CaCCgCaaaaAaAAAC",
+        json=get_json("tests/data/valid_url_put.json"),
+    ) as response:
+        async with pg_engine.acquire() as conn:
+            description = await conn.fetchval(
+                select([links_table.c.description]).where(
+                    links_table.c.id == 1,
+                ),
+            )
+
+            assert response.status == HTTPStatus.CREATED
+            assert description == "Updated description"
+
+
+async def test_update_not_valid(
+    api_client, clear_db, create_valid_link, pg_engine
+):
+    async with api_client.put(
+        "CaCCgCaaaaAaAAAC",
+        json=get_json("tests/data/not_valid_url_put.json"),
+    ) as response:
+        assert response.status == HTTPStatus.BAD_REQUEST

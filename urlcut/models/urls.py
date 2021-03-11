@@ -13,3 +13,12 @@ class UrlCreateData(BaseModel):
     labels: List[str] = []
     creator: str = ""
     qr: bool = False
+
+
+class UrlUpdateData(BaseModel):
+    name: str
+    description: str
+    active: bool
+    notActiveAfter: Optional[datetime] = None
+    labels: List[str]
+    creator: str

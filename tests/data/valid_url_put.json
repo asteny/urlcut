@@ -1,0 +1,11 @@
+{
+  "name": "Updated link",
+  "description": "Updated description",
+  "labels": [
+    "Banzai",
+    "DevSecOps",
+    "Go"
+  ],
+  "creator": "Pavel Sofrony",
+  "active": true
+}
