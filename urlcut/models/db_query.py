@@ -157,37 +157,20 @@ async def get_link_by_short_path(db: pool, short_path: str) -> Record:
         )
 
 
-async def update_link_if_exists(
+async def update_link(
     db: pool, short_path: str, data: UrlUpdateData
-) -> bool:
+) -> Record:
     async with db.transaction() as conn:
-        id_query = (
-            select(
-                [links_table.c.id],
-            )
-            .with_for_update()
+        return await conn.fetchrow(
+            links_table.update()
             .where(links_table.c.short_url_path == short_path)
-        )
-
-        id = await conn.fetchval(id_query)
-
-        if id:
-            log.debug("Short link id for update is %r", id)
-            await conn.fetchrow(
-                links_table.update()
-                .where(
-                    links_table.c.id == int(id),
-                )
-                .values(
-                    name=data.name,
-                    description=data.description,
-                    not_active_after=data.notActiveAfter,
-                    labels=data.labels,
-                    creator=data.creator,
-                    active=data.active,
-                ),
+            .values(
+                name=data.name,
+                description=data.description,
+                not_active_after=data.notActiveAfter,
+                labels=data.labels,
+                creator=data.creator,
+                active=data.active,
             )
-            log.info("Short link %r updated", short_path)
-            return True
-    log.debug("Short link %r for update not found", short_path)
-    return False
+            .returning(links_table.c.id),
+        )

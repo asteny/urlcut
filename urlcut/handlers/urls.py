@@ -11,7 +11,7 @@ from urlcut.models.db_query import (
     insert_url_data,
     get_url_short_path,
     get_link_by_short_path,
-    update_link_if_exists,
+    update_link,
 )
 from urlcut.models.urls import UrlCreateData, UrlUpdateData
 from urlcut.utils.generate_link import generate_link
@@ -108,12 +108,11 @@ class Urls(Base):
         parsed_url_data = UrlUpdateData(**data)
         log.debug("Parsed url_data is %r", parsed_url_data)
 
-        is_updated = await update_link_if_exists(
+        if await update_link(
             db=self.db,
             short_path=short_path,
             data=parsed_url_data,
-        )
-        if is_updated:
+        ):
             return json_response(status=HTTPStatus.CREATED)
 
         return json_response(status=HTTPStatus.NOT_FOUND)
