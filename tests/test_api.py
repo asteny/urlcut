@@ -387,7 +387,7 @@ async def test_update_valid(
                 ),
             )
 
-            assert response.status == HTTPStatus.CREATED
+            assert response.status == HTTPStatus.OK
             assert description == "Updated description"
 
 

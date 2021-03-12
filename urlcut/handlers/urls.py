@@ -113,7 +113,7 @@ class Urls(Base):
             short_path=short_path,
             data=parsed_url_data,
         ):
-            return json_response(status=HTTPStatus.CREATED)
+            return json_response(status=HTTPStatus.OK)
 
         return json_response(status=HTTPStatus.NOT_FOUND)
 
