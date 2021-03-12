@@ -11,8 +11,9 @@ from urlcut.models.db_query import (
     insert_url_data,
     get_url_short_path,
     get_link_by_short_path,
+    update_link,
 )
-from urlcut.models.urls import UrlCreateData
+from urlcut.models.urls import UrlCreateData, UrlUpdateData
 from urlcut.utils.generate_link import generate_link
 
 
@@ -96,6 +97,25 @@ class Urls(Base):
             log.info("%r not found", short_path)
 
         return json_response(status=HTTPStatus.NO_CONTENT)
+
+    async def put(self):
+        data = await self.request.json()
+        log.debug("Url data from post request is %r", data)
+
+        short_path = self.request.match_info["short_path"]
+        log.debug("Short link from update request is %r", short_path)
+
+        parsed_url_data = UrlUpdateData(**data)
+        log.debug("Parsed url_data is %r", parsed_url_data)
+
+        if await update_link(
+            db=self.db,
+            short_path=short_path,
+            data=parsed_url_data,
+        ):
+            return json_response(status=HTTPStatus.OK)
+
+        return json_response(status=HTTPStatus.NOT_FOUND)
 
 
 class UrlInfo(Base):

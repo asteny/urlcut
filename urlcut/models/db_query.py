@@ -8,7 +8,7 @@ from sqlalchemy.sql.expression import true
 from sqlalchemy.dialects.postgresql import insert
 
 from urlcut.models.db import links_table
-from urlcut.models.urls import UrlCreateData
+from urlcut.models.urls import UrlCreateData, UrlUpdateData
 from urlcut.utils.generate_link import generate_link_path, salted_number
 
 
@@ -154,4 +154,23 @@ async def get_link_by_short_path(db: pool, short_path: str) -> Record:
             ).where(
                 links_table.c.short_url_path == short_path,
             ),
+        )
+
+
+async def update_link(
+    db: pool, short_path: str, data: UrlUpdateData
+) -> Record:
+    async with db.transaction() as conn:
+        return await conn.fetchrow(
+            links_table.update()
+            .where(links_table.c.short_url_path == short_path)
+            .values(
+                name=data.name,
+                description=data.description,
+                not_active_after=data.notActiveAfter,
+                labels=data.labels,
+                creator=data.creator,
+                active=data.active,
+            )
+            .returning(links_table.c.id),
         )

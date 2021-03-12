@@ -47,7 +47,8 @@ class Rest(AIOHTTPService):
         router.add_route("GET", "/api/ping", Ping)
         router.add_route("POST", "/api/create", Urls)
         router.add_route("GET", r"/{short_path:[a-zA-Z0-9]+}", Urls)
-        router.add_route("GET", r"/{short_path:[a-zA-Z0-9]+}/info", UrlInfo)
+        router.add_route("PUT", r"/{short_path:[a-zA-Z0-9]+}", Urls)
         router.add_route("DELETE", r"/{short_path:[a-zA-Z0-9]+}", Urls)
+        router.add_route("GET", r"/{short_path:[a-zA-Z0-9]+}/info", UrlInfo)
 
         return app
