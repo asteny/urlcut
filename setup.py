@@ -1,8 +1,7 @@
-from setuptools import find_packages, setup
+from setuptools import setup, find_packages
+import urlcut as module
 
-
-__version__ = "0.1"
-__author__ = "Pavel Sofrony <pavel@sofrony.ru>"
+module_name = "urlcut"
 
 
 def load_requirements(fname: str):
@@ -13,14 +12,14 @@ def load_requirements(fname: str):
 
 
 setup(
-    name="urlcut",
-    version=__version__,
-    author=__author__,
-    author_email="pavel@sofrony.ru",
-    license="MIT",
-    description="Prometheus exporter for ssl certs",
+    name=module_name.replace("_", "-"),
+    version=module.__version__,
+    author=module.__author__,
+    author_email=module.authors_email,
+    license=module.__license__,
+    description=module.package_info,
     platforms="all",
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=load_requirements("requirements.txt"),
     extras_require={"dev": load_requirements("requirements.dev.txt")},
     python_requires=">=3.7",
