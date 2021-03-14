@@ -5,6 +5,8 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
 
     services:
       postgres:
@@ -37,3 +39,40 @@ jobs:
             wait-for-port postgres:5432 &&
             /home/bin/urlcut-db upgrade head &&
             /home/bin/pytest -vvv tests"
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    needs: test
+    if: contains(github.ref, 'release')
+    steps:
+      - name: Checkout with tags
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Bump, get version, build dist
+        run: |
+          python bump.py $(python setup.py --name)/version.py
+          echo "app_version=$(python setup.py --version)" >> $GITHUB_ENV
+          echo "${{ env.app_version }}"
+          python setup.py sdist
+
+      - name: Build docker & push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ghcr.io
+          repository: asteny/urlcut/urlcut
+          tags: ${{ env.app_version }}

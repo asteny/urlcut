@@ -132,3 +132,6 @@ dmypy.json
 .idea/
 docker-compose.yml
 ignore
+
+# Bump version file
+/*/version.py
