@@ -1,0 +1,237 @@
+openapi: 3.0.1
+info:
+  title: Urlcut
+  description: 'Urlcut API description'
+  contact:
+    name: Github repo
+    url: https://github.com/asteny/urlcut
+  version: 0.1.1
+servers:
+  - url: https://example.ru
+    description: Example server
+tags:
+  - name: create
+    description: For creating short url
+  - name: ping
+    description: Service health check
+  - name: short_link
+    description: Get, update, delete short link
+  - name: info
+    description: Short link info
+
+paths:
+  /api/create:
+    post:
+      tags:
+        - create
+      summary: For creating short url
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                url:
+                  type: string
+                description:
+                  type: string
+                active:
+                  type: boolean
+                  default: True
+                notActiveAfter:
+                  type: number
+                  example: 1677562064
+                labels:
+                  type: array
+                  items:
+                    type: string
+                creator:
+                  type: string
+                qr:
+                  type: boolean
+                  default: False
+              required:
+                - name
+                - url
+      responses:
+        201:
+          description: Short url created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: https://example.com/CaCCgCaaaaAaAAAa
+        200:
+          description: Short url exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    example: https://example.com/CaCCgCaaaaAaAAAa
+        400:
+          description: Bad request data
+
+  /api/ping:
+    get:
+      tags:
+        - ping
+      summary: Service health check
+      responses:
+        200:
+          description: Service alive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pg_health:
+                    type: string
+                    example: alive
+        503:
+          description: Servics dead
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pg_health:
+                    type: string
+                    example: dead
+  /{url_path}:
+    parameters:
+        - name: url_path
+          in: path
+          required: true
+          description: Short url path
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9]+$'
+    get:
+      tags:
+        - short_link
+      summary: Redirect from short url to long
+      responses:
+        301:
+          description: Moved to long url
+          headers:
+            Location:
+              schema:
+                type: string
+                format: url
+                example: https://example.com/CaCCgCaaaaAaAAAa
+              description: Moved to
+        404:
+          description: Not found
+        410:
+          description: Link not in active state
+    put:
+      tags:
+        - short_link
+      summary: Modify short url data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                active:
+                  type: boolean
+                  default: True
+                notActiveAfter:
+                  type: number
+                  example: 1677562064
+                labels:
+                  type: array
+                  items:
+                    type: string
+                creator:
+                  type: string
+              required:
+                - name
+                - description
+                - active
+                - labels
+                - creator
+      responses:
+        200:
+          description: Url data was updated
+        400:
+          description: Bad request data
+        404:
+          description: Not found
+    delete:
+      tags:
+        - short_link
+      summary: Make short url inactive
+      responses:
+        204:
+          description: Link was deactivated or not found
+
+  /{url_path}/info:
+    parameters:
+        - name: url_path
+          in: path
+          required: true
+          description: Short url path
+          schema:
+            type: string
+            pattern: '^[a-zA-Z0-9]+$'
+    get:
+      tags:
+        - info
+      summary: Redirect from short url to long
+      responses:
+        200:
+          description: Info about short url
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  long_url:
+                    type: string
+                    format: url
+                    example: https://some.usfull.link.ru/ololo
+                  short_url_path:
+                    type: string
+                    example: CaCCgCaaaaAaAAAa
+                  active:
+                    type: boolean
+                  notActiveAfter:
+                    type: number
+                    example: 1677562064
+                  labels:
+                    type: array
+                    items:
+                      type: string
+                      example: ["PostgreSQL", "DevOps", "Python"]
+                  creator:
+                    type: string
+                  created_at:
+                    type: number
+                    example: 1615738269.442408
+                  updated_at:
+                    type: number
+                    example: 1615738269.442408
+        404:
+          description: Not found
