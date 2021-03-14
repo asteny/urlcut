@@ -1,0 +1,32 @@
+version: "2"
+
+services:
+  pg:
+    image: postgres:12
+    hostname: pg
+    restart: always
+    environment:
+      POSTGRES_USER: urlcut
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: urlcut
+    volumes:
+      - ./ignore:/var/lib/postgresql/data
+    ports:
+      - 0.0.0.0:5432:5432
+
+  urlcut:
+    image: ghcr.io/asteny/urlcut/urlcut:0.1.1
+    hostname: urlcut
+    restart: always
+    depends_on:
+      - pg
+    environment:
+      URLCUT_PG_URL: postgresql://urlcut:12345@pg/urlcut
+      URLCUT_ADDRESS: 0.0.0.0
+      URLCUT_LOG_LEVEL: debug
+      URLCUT_SALT: 1111
+      URLCUT_PEPPER: 2222
+      URLCUT_ALPHABET: aACg
+      URLCUT_DOMAIN: http://example.com
+    ports:
+      - 8080:8080
