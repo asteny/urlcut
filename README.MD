@@ -16,5 +16,5 @@ PostgreSQL
 docker exec -ti urlcut_urlcut_1 urlcut-db upgrade head
 ```
 
-#### TODO
-- swagger
+#### API description
+[OpenAPI specification](https://asteny.github.io/urlcut/)
